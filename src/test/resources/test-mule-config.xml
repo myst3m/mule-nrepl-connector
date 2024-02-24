@@ -1,0 +1,19 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:nrepl="http://www.mulesoft.org/schema/mule/nrepl"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/nrepl http://www.mulesoft.org/schema/mule/nrepl/current/mule-nrepl.xsd">
+
+    <nrepl:config name="config" configId="configId">
+        <nrepl:connection requiredParameter="aValue" />
+    </nrepl:config>
+
+    <flow name="sayHiFlow">
+        <nrepl:say-hi person="Mariano Gonzalez"/>
+    </flow>
+
+    <flow name="retrieveInfoFlow">
+        <nrepl:retrieve-info config-ref="config"/>
+    </flow>
+
+</mule>
