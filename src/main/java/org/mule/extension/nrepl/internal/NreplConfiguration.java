@@ -18,20 +18,20 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 public class NreplConfiguration {
 
 
-  @Parameter
-  private String configId;
+    @Parameter
+    private String configId;
 
-  @DisplayName("Listen Port")
-  @Parameter
-  @Optional(defaultValue = "8081")
-  private int port;
+    @DisplayName("Listen Port")
+    @Parameter
+    @Optional(defaultValue = "8081")
+    private int port;
+    
+    public String getConfigId(){
+	return configId;
+    }
 
+    public int getPort() {
+	return port;
+    }
 
-  public String getConfigId(){
-    return configId;
-  }
-
-  public int getPort() {
-      return port;
-  }
 }

@@ -8,7 +8,8 @@ import java.io.InputStream;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.connection.ConnectionProvider;
-
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
@@ -22,6 +23,7 @@ import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.mule.extension.nrepl_connector.internal.Transport;
 
 @Alias("listener")
 @EmitsResponse
@@ -34,6 +36,14 @@ public class NreplListener extends Source<InputStream, HttpRequestAttributes> {
     @Config
     private NreplConfiguration config;
     
+    @DisplayName("Transport")
+    @Parameter
+    public Transport  protocol = Transport.HTTP;
+
+    public Transport getTransport() {
+	return protocol;
+    }
+
     public void onStart(SourceCallback<InputStream, HttpRequestAttributes> sourceCallBack) {
 	int port = config.getPort();
 	
@@ -43,11 +53,24 @@ public class NreplListener extends Source<InputStream, HttpRequestAttributes> {
 	require.invoke(Clojure.read("silvur.util"));
 	IFn nrepl = Clojure.var("silvur.util", "nrepl-start");
 	IFn keyword = Clojure.var("clojure.core", "keyword");
-	HashMap opts = new HashMap<clojure.lang.Keyword, Integer>();
+	HashMap opts = new HashMap<clojure.lang.Keyword, Object>();
 	opts.put(keyword.invoke("port"), port);
+	if (Transport.CIDER == protocol) {
+	    opts.put(keyword.invoke("cider"), true);
+	} else if (Transport.TTY == protocol) {
+	    opts.put(keyword.invoke("tty"), true);
+	    
+	}
+	
 	nrepl.invoke(opts);
 
     }
     public void onStop() {
+	LOGGER.info("onStop");
+	IFn require = Clojure.var("clojure.core", "require");
+	require.invoke(Clojure.read("silvur.util"));
+	IFn nrepl = Clojure.var("silvur.util", "nrepl-stop");
+	nrepl.invoke();
+
     }
 }
