@@ -6,6 +6,11 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import java.io.InputStream;
 import org.mule.runtime.extension.api.annotation.source.EmitsResponse;
+import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
+import org.mule.runtime.extension.api.annotation.execution.OnTerminate;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Content;
+import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -50,8 +55,8 @@ public class NreplListener extends Source<InputStream, HttpRequestAttributes> {
 	LOGGER.info("onStart");
 	
 	IFn require = Clojure.var("clojure.core", "require");
-	require.invoke(Clojure.read("silvur.util"));
-	IFn nrepl = Clojure.var("silvur.util", "nrepl-start");
+	require.invoke(Clojure.read("mule-nrepl-connector.core"));
+	IFn onStart = Clojure.var("mule-nrepl-connector.core", "on-start");
 	IFn keyword = Clojure.var("clojure.core", "keyword");
 	HashMap opts = new HashMap<clojure.lang.Keyword, Object>();
 	opts.put(keyword.invoke("port"), port);
@@ -61,17 +66,31 @@ public class NreplListener extends Source<InputStream, HttpRequestAttributes> {
 	    opts.put(keyword.invoke("tty"), true);
 	    
 	}
-
 	opts.put(keyword.invoke("callback"), sourceCallBack);
-	nrepl.invoke(opts);
-
+	onStart.invoke(opts);
     }
+
+    @OnSuccess
+    public void onSuccess(@Content String responseBody,
+                          @Optional String responseStatusCode,
+                          SourceCallbackContext callbackContext) {
+	IFn require = Clojure.var("clojure.core", "require");
+	require.invoke(Clojure.read("mule-nrepl-connector.core"));
+	IFn nrepl = Clojure.var("mule-nrepl-connector", "on-sucess");
+	nrepl.invoke(responseBody, responseStatusCode, callbackContext);	
+	
+    }
+    
     public void onStop() {
 	LOGGER.info("onStop");
 	IFn require = Clojure.var("clojure.core", "require");
-	require.invoke(Clojure.read("silvur.util"));
-	IFn nrepl = Clojure.var("silvur.util", "nrepl-stop");
+	require.invoke(Clojure.read("mule-nrepl-connector.core"));
+	IFn nrepl = Clojure.var("mule-nrepl-connector", "on-stop");
 	nrepl.invoke();
 
     }
+
+  @OnTerminate
+  public void onTerminate() {}
+
 }
