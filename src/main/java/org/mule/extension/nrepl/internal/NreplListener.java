@@ -61,7 +61,8 @@ public class NreplListener extends Source<InputStream, HttpRequestAttributes> {
 	    opts.put(keyword.invoke("tty"), true);
 	    
 	}
-	
+
+	opts.put(keyword.invoke("callback"), sourceCallBack);
 	nrepl.invoke(opts);
 
     }
