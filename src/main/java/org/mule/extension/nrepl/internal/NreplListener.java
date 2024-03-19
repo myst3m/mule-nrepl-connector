@@ -76,7 +76,7 @@ public class NreplListener extends Source<InputStream, HttpRequestAttributes> {
                           SourceCallbackContext callbackContext) {
 	IFn require = Clojure.var("clojure.core", "require");
 	require.invoke(Clojure.read("mule-nrepl-connector.core"));
-	IFn nrepl = Clojure.var("mule-nrepl-connector", "on-sucess");
+	IFn nrepl = Clojure.var("mule-nrepl-connector.core", "on-success");
 	nrepl.invoke(responseBody, responseStatusCode, callbackContext);	
 	
     }
@@ -85,7 +85,7 @@ public class NreplListener extends Source<InputStream, HttpRequestAttributes> {
 	LOGGER.info("onStop");
 	IFn require = Clojure.var("clojure.core", "require");
 	require.invoke(Clojure.read("mule-nrepl-connector.core"));
-	IFn nrepl = Clojure.var("mule-nrepl-connector", "on-stop");
+	IFn nrepl = Clojure.var("mule-nrepl-connector.core", "on-stop");
 	nrepl.invoke();
 
     }

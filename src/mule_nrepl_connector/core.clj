@@ -20,9 +20,35 @@
   [reitit.http.interceptors.parameters :as params]
   [reitit.http.interceptors.muuntaja :as muuntaja]
   [taoensso.timbre :as log]
-  [org.httpkit.server :as hs]))
+  [org.httpkit.server :as hs]
+  [clojure.reflect :as cr]
+  [clojure.pprint ::as pp]
+  [silvur.util :refer [edn->json]])
+ 
+ (:import [org.mule.runtime.extension.api.runtime.operation Result]
+          [org.mule.runtime.api.metadata MediaType]
+          [org.mule.runtime.extension.api.runtime.source SourceCallbackContext]
+          [java.io Serializable]))
+
+(defn run-flow
+  ([]
+   (let [{:keys [callback]} su/*options*]
+     (fn [{:keys [body] :as req}]
+       (let [
+             ctx (.createContext callback)
+             data (.bytes body;
+                          )
+             result (.. (Result/builder)
+                        (output data)
+                        (length (count data))
+                        (mediaType MediaType/APPLICATION_JSON)
+                        ;;(attributesMediaType MediaType/APPLICATION_JSON)
+                        (build))]
+         (.handle callback result ctx)
+         {:status 200})))))
 
 (def route ["" {:muuntaja m/instance}
+            ["/api" {:post (run-flow)}]
             ["/ping" {:get (fn [req] {:status 200 :body "pong"})}]
             ["/nrepl" {:post su/nrepl-handler}]])
 
@@ -35,12 +61,15 @@
            :executor sieppari/executor}))
 
 
+
+
 (defn on-start [args]
-  (log/debug "Hello on-start" (into {} args))
+  (log/info "Hello on-start" (into {} args))
   (su/nrepl-start args))
 
 (defn on-success [& args]
-  (log/debug "Hello on-success" (into {} args)))
+  (log/info "Hello on-success" args))
 
 (defn on-stop []
-  (println "Hello on-stop"))
+  (println "Hello on-stop")
+  (su/nrepl-stop))
