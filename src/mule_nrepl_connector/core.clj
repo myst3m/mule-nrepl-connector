@@ -30,25 +30,25 @@
           [org.mule.runtime.extension.api.runtime.source SourceCallbackContext]
           [java.io Serializable]))
 
-(defn run-flow
+(defn get-run-flow
   ([]
    (let [{:keys [callback]} su/*options*]
      (fn [{:keys [body] :as req}]
-       (let [
-             ctx (.createContext callback)
-             data (.bytes body;
-                          )
-             result (.. (Result/builder)
-                        (output data)
-                        (length (count data))
-                        (mediaType MediaType/APPLICATION_JSON)
-                        ;;(attributesMediaType MediaType/APPLICATION_JSON)
-                        (build))]
-         (.handle callback result ctx)
-         {:status 200})))))
+       (try
+         (let [ctx (.createContext callback)
+               data (.getBytes body)
+               result (.. (Result/builder)
+                          (output data)
+                          (length (count data))
+                          (mediaType MediaType/APPLICATION_JSON)
+                          ;;(attributesMediaType MediaType/APPLICATION_JSON)
+                          (build))]
+           (.handle callback result ctx)
+           {:status 200})
+         (catch Exception e {:status 200 :body (pr-str (println e))}))))))
 
 (def route ["" {:muuntaja m/instance}
-            ["/api" {:post (run-flow)}]
+            ["/api" {:post (gen-run-flow)}]
             ["/ping" {:get (fn [req] {:status 200 :body "pong"})}]
             ["/nrepl" {:post su/nrepl-handler}]])
 
