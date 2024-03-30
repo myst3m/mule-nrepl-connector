@@ -6,7 +6,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>fe1db8fb-8261-4b5c-a591-06fea582f980</groupId>
   <artifactId>mule-nrepl-connector</artifactId>
-  <version>0.2.10</version>
+  <version>0.2.13</version>
   <packaging>mule-extension</packaging>
   <name>nREPL Extension</name>
 
