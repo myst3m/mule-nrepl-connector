@@ -51,9 +51,9 @@
 (def route ["" {:muuntaja m/instance}
             ["/api" {:post (get-run-flow)}]
             ["/ping" {:get (fn [req] {:status 200 :body "pong"})}]
-            ["/request" {:get (fn [req]
-                                {:status 200 :body (-> (dissoc req :reitit.core/match)
-                                                       (dissoc :reitit.core/router))})}]
+            ["/echo" {:get (fn [req]
+                             {:status 200 :body (-> (dissoc req :reitit.core/match)
+                                                    (dissoc :reitit.core/router))})}]
             ["/nrepl" {:post su/nrepl-handler}]])
 
 (def app (rh/ring-handler
@@ -69,7 +69,7 @@
 
 (defn on-start [args]
   (log/info "Hello on-start" (into {} args))
-  (su/nrepl-start args))
+  (su/nrepl-start (assoc (into {} args) :app app)))
 
 (defn on-success [& args]
   (log/info "Hello on-success" args))
