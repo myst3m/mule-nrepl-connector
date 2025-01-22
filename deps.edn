@@ -1,13 +1,13 @@
 {:paths ["src" "resources"],
   :mvn/repos {"mule" {:url "https://repository-master.mulesoft.org/nexus/content/repositories/releases"}}
  
- :deps {org.clojure/clojure {:mvn/version "1.11.1"},
-        io.gitlab.myst3m/silvur {:mvn/version "2.7.1"}
+ :deps {org.clojure/clojure {:mvn/version "1.12.0"},
+        io.gitlab.myst3m/silvur {:mvn/version "3.3.2"}
         org.clojure/tools.cli {:mvn/version "1.0.206"},
         mount/mount {:mvn/version "0.1.17"},
         metosin/reitit {:mvn/version "0.7.0-alpha3"},
         org.mule.connectors/mule-http-connector {:mvn/version "1.9.0"}
-        http-kit/http-kit {:mvn/version "2.7.0-beta3"},
+        http-kit/http-kit {:mvn/version "2.9.0-alpha2"}
         camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.3"}},
  
  :aliases {:test {:extra-paths ["test"],
@@ -18,12 +18,15 @@
                                 "cognitect.test-runner"
                                 "-d"
                                 "test"]},
-           :deploy {:exec-fn silvur.build/exec-deploy
-                    :exec-args {artifact "mule-nrepl-connector"
-                                version "0.0.1"
-                                file-path "target/mule-nrepl-connector-0.0.1.jar"}}
-           :uberjar {:exec-fn silvur.build/exec-uberjar,
-                     :exec-args {:artifact "mule-nrepl-connector",
-                                 :version "0.0.1",
-                                 :aot true,
-                                 :main "mule-nrepl-connector.core"}}}}
+           :pom {:exec-fn silvur.build/pom
+                 :exec-args {artifact "mule-nrepl-connector",
+                             version "0.0.2",
+                             main "mule-nrepl-connector.core"}}
+           :jar {:exec-fn silvur.build/jar
+                 :exec-args {artifact "mule-nrepl-connector/mule-nrepl-connector",
+                             version "0.0.2",
+                             main "mule-nrepl-connector.core"}}
+           :uber {:exec-fn silvur.build/uber
+                  :exec-args {artifact "mule-nrepl-connector",
+                              version "0.0.2",
+                              main "mule-nrepl-connector.core"}}}}
